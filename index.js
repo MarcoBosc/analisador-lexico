@@ -63,6 +63,42 @@ function addWord(word) {
   }
 }
 
+// mapeia as palavras para adicionar elas e suas respectivas linhas
+function mapWords(words) {
+  let stateMapping = {}; 
+  let currentState = 1;    
+
+  // Inicializa o estado q0
+  stateMapping["q0"] = {};
+
+  function addWordToMap(word) {
+      let prevState = "q0"; 
+
+      // Para cada letra da palavra
+      for (let i = 0; i < word.length; i++) {
+          let currentLetter = word[i].toUpperCase();
+
+          // Verifica se já existe uma transição para a letra atual no estado anterior
+          let nextState = Object.keys(stateMapping[prevState]).find(state => stateMapping[prevState][state] === currentLetter);
+
+          // Se não existir, cria um novo estado
+          if (!nextState) {
+              nextState = `q${currentState}`;
+              stateMapping[prevState][nextState] = currentLetter;
+              stateMapping[nextState] = {};  
+              currentState++;  
+          }
+
+          prevState = nextState; 
+      }
+  }
+
+  // Mapeando todas as palavras da lista words
+  words.forEach(word => addWordToMap(word));
+  console.log(stateMapping);
+  return stateMapping;
+}
+
 
 function resizeTable(words) {
   let mappedWords = mapWords(words);
@@ -124,45 +160,5 @@ function resizeTable(words) {
     tbody.appendChild(tr);
   });
 }
-
-
-
-
-// mapeia as palavras para adicionar elas e suas respectivas linhas
-function mapWords(words) {
-  let stateMapping = {}; 
-  let currentState = 1;    
-
-  // Inicializa o estado q0
-  stateMapping["q0"] = {};
-
-  function addWordToMap(word) {
-      let prevState = "q0"; 
-
-      // Para cada letra da palavra
-      for (let i = 0; i < word.length; i++) {
-          let currentLetter = word[i].toUpperCase();
-
-          // Verifica se já existe uma transição para a letra atual no estado anterior
-          let nextState = Object.keys(stateMapping[prevState]).find(state => stateMapping[prevState][state] === currentLetter);
-
-          // Se não existir, cria um novo estado
-          if (!nextState) {
-              nextState = `q${currentState}`;
-              stateMapping[prevState][nextState] = currentLetter;
-              stateMapping[nextState] = {};  
-              currentState++;  
-          }
-
-          prevState = nextState; 
-      }
-  }
-
-  // Mapeando todas as palavras da lista words
-  words.forEach(word => addWordToMap(word));
-  console.log(stateMapping);
-  return stateMapping;
-}
-
 
 
