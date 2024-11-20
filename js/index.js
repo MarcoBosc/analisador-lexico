@@ -1,10 +1,11 @@
 const wordInput = document.getElementById('wordInput');
 const wordList = document.getElementById('wordList');
 const randomWordBtn = document.getElementById('randomWordBtn');
+const validateInput = document.getElementById('validateWord');
 
 // Lista de palavras
 const words = [];
-
+let mappedWords;
 
 // Adicionar palavra ao pressionar espaço
 wordInput.addEventListener('keypress', (e) => {
@@ -65,32 +66,32 @@ function addWord(word) {
 
 // mapeia as palavras para adicionar elas e suas respectivas linhas
 function mapWords(words) {
-  let stateMapping = {}; 
-  let currentState = 1;    
+  let stateMapping = {};
+  let currentState = 1;
 
   // Inicializa o estado q0
   stateMapping["q0"] = {};
 
   function addWordToMap(word) {
-      let prevState = "q0"; 
+    let prevState = "q0";
 
-      // Para cada letra da palavra
-      for (let i = 0; i < word.length; i++) {
-          let currentLetter = word[i].toUpperCase();
+    // Para cada letra da palavra
+    for (let i = 0; i < word.length; i++) {
+      let currentLetter = word[i].toUpperCase();
 
-          // Verifica se já existe uma transição para a letra atual no estado anterior
-          let nextState = Object.keys(stateMapping[prevState]).find(state => stateMapping[prevState][state] === currentLetter);
+      // Verifica se já existe uma transição para a letra atual no estado anterior
+      let nextState = Object.keys(stateMapping[prevState]).find(state => stateMapping[prevState][state] === currentLetter);
 
-          // Se não existir, cria um novo estado
-          if (!nextState) {
-              nextState = `q${currentState}`;
-              stateMapping[prevState][nextState] = currentLetter;
-              stateMapping[nextState] = {};  
-              currentState++;  
-          }
-
-          prevState = nextState; 
+      // Se não existir, cria um novo estado
+      if (!nextState) {
+        nextState = `q${currentState}`;
+        stateMapping[prevState][nextState] = currentLetter;
+        stateMapping[nextState] = {};
+        currentState++;
       }
+
+      prevState = nextState;
+    }
   }
 
   // Mapeando todas as palavras da lista words
@@ -101,7 +102,7 @@ function mapWords(words) {
 
 
 function resizeTable(words) {
-  let mappedWords = mapWords(words);
+  mappedWords = mapWords(words);
 
   // Identificando todos os índices qN usados, incluindo vazios
   let allIndexes = new Set();
@@ -161,4 +162,57 @@ function resizeTable(words) {
   });
 }
 
+function checkWordInAlphabet(word) {
+  const slicedWord = word.split(""); // Divide a palavra em letras
+  let currentState = "q0"; // Começa no estado inicial
 
+  console.log(mappedWords, "\nPalavras mapeadas"); // Debug do mapeamento
+
+  for (let key of slicedWord) {
+    key = key.toUpperCase();
+
+    // Obter o estado atual no mapeamento
+    const stateMapping = mappedWords[currentState];
+    if (!stateMapping) {
+      console.log(`Estado inválido: ${currentState}`);
+      return;
+    }
+
+    // Procurar se a chave está mapeada no estado atual
+    const nextState = Object.keys(stateMapping).find(
+      state => stateMapping[state] === key
+    );
+
+    console.log(`Key: ${key}`);
+    console.log(`Current State: ${currentState}`);
+    console.log(`State Mapping:`, stateMapping);
+    console.log(`Next State: ${nextState}`);
+
+    if (nextState) {
+      currentState = nextState; // Atualiza para o próximo estado
+    } else {
+      console.log(`A palavra '${key}' Não pertence ao alfabeto! :(`);
+      return;
+    }
+  }
+
+  console.log(`A palavra '${word}' pertence ao alfabeto! :D`);
+}
+
+
+
+// Palavras digitadas para validação
+validateInput.addEventListener('keypress', (e) => {
+  if (e.key === ' ') {
+    e.preventDefault();
+    const word = validateInput.value.trim();
+    if (word) {
+      checkWordInAlphabet(word);
+      validateInput.value = '';
+    }
+  } else if (e.key === "QUALQUER CARACTERRE QUE A PESSOA DIGITAR") {
+    // pinta o indice digitado na tabela de verde
+  } else if (e.key === 'backspace') {
+    // pinta da cor default o tr e volta para a iteração anterior
+  }
+});
