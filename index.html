@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisador Léxico</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .word-item {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+
+        .word-item button {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: none;
+            border: none;
+            color: red;
+            font-size: 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-4">
+        <h1>Analisador Léxico</h1>
+
+        <input type="text" id="wordInput" class="form-control mb-3" placeholder="Digite uma palavra e aperte espaço">
+
+        <button id="randomWordBtn" class="btn btn-primary mb-3">Gerar Palavra Aleatória</button>
+        <h4>Palavras Adicionadas</h4>
+        <div id="wordList" class="mb-4"></div>
+
+        <input class="form-control mb-4" rows="3"
+            placeholder="Texto adicional (sem funcionalidade por enquanto)"></input>
+
+        <div class="container mt-4">
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="bg-primary text-white">
+                        <th class="bg-secondary text-white">&delta;</th>
+                        <script>
+                            for (let i = 65; i <= 90; i++) { // Letras de A a Z
+                                document.write(`<th class="bg-secondary text-white">${String.fromCharCode(i)}</th>`);
+                            }
+                        </script>
+                    </tr>
+                </thead>
+                <tbody>
+                    <script>
+                        for (let row = 0; row < 2; row++) { // Altere '5' para o número de linhas desejado
+                            document.write("<tr>");
+                            document.write(`<td>q${row}</td>`); // Nome das linhas: q0, q1, q2...
+                            for (let col = 0; col < 26; col++) { // 26 colunas (alfabeto)
+                                document.write("<td></td>");
+                            }
+                            document.write("</tr>");
+                        }
+                    </script>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+
+</html>
