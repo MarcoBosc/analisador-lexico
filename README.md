@@ -1,4 +1,8 @@
 # Analisador Léxico - Trabalho Final de Linguagens Formais
+[![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](https://github.com/feerodgs/uTrackProject/blob/main/README.pt-br.md)
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/feerodgs/uTrackProject/blob/main/README.md)
+
+
 
 ## Desenvolvido por
 Marco Boschetti e Ricardo Dequi
