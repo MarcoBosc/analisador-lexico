@@ -1,4 +1,7 @@
 # Lexical Analyzer - Final Project for Formal Languages Course
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/MarcoBosc/analisador-lexico/blob/main/README.en.md)
+[![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](https://github.com/MarcoBosc/analisador-lexico/blob/main/README.md)
+
 
 ## Developed by
 Marco Boschetti and Ricardo Dequi
