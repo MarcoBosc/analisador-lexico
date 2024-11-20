@@ -47,7 +47,7 @@ function addWord(word) {
     resizeTable(words);
     const wordDiv = document.createElement('div');
     wordDiv.className = 'word-item';
-    wordDiv.textContent = word.toLowerCase();
+    wordDiv.textContent = word.toUpperCase();
 
     // Botão para remover a palavra
     const removeBtn = document.createElement('button');
@@ -55,6 +55,7 @@ function addWord(word) {
     removeBtn.addEventListener('click', () => {
       wordList.removeChild(wordDiv);
       words.splice(words.indexOf(word), 1);
+      resizeTable(words); // chama a function de dar resize no automato
     });
 
     wordDiv.appendChild(removeBtn);
@@ -129,19 +130,18 @@ function resizeTable(words) {
 
 // mapeia as palavras para adicionar elas e suas respectivas linhas
 function mapWords(words) {
-  let stateMapping = {};  // Objeto para armazenar as transições de estado
-  let currentState = 1;    // Inicia o contador de estados com 1 (q0 já está implícito)
+  let stateMapping = {}; 
+  let currentState = 1;    
 
   // Inicializa o estado q0
   stateMapping["q0"] = {};
 
-  // Função para adicionar uma palavra ao mapeamento
   function addWordToMap(word) {
-      let prevState = "q0";  // Todas as palavras começam de q0
+      let prevState = "q0"; 
 
       // Para cada letra da palavra
       for (let i = 0; i < word.length; i++) {
-          let currentLetter = word[i].toUpperCase();  // Garantir que as letras sejam maiúsculas
+          let currentLetter = word[i].toUpperCase();
 
           // Verifica se já existe uma transição para a letra atual no estado anterior
           let nextState = Object.keys(stateMapping[prevState]).find(state => stateMapping[prevState][state] === currentLetter);
@@ -150,15 +150,15 @@ function mapWords(words) {
           if (!nextState) {
               nextState = `q${currentState}`;
               stateMapping[prevState][nextState] = currentLetter;
-              stateMapping[nextState] = {};  // Cria o novo estado no mapeamento
-              currentState++;  // Avança o contador de estados
+              stateMapping[nextState] = {};  
+              currentState++;  
           }
 
-          prevState = nextState;  // O próximo estado se torna o estado anterior
+          prevState = nextState; 
       }
   }
 
-  // Mapeando todas as palavras
+  // Mapeando todas as palavras da lista words
   words.forEach(word => addWordToMap(word));
   console.log(stateMapping);
   return stateMapping;
