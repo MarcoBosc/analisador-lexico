@@ -27,6 +27,10 @@
             font-size: 12px;
             cursor: pointer;
         }
+
+        span {
+            margin-right: 10px;
+        }
     </style>
 </head>
 
@@ -40,10 +44,8 @@
         <h4>Palavras Adicionadas</h4>
         <div id="wordList" class="mb-4"></div>
 
-        <input class="form-control mb-4" rows="3"
-            placeholder="Digite a palavra para validação e aperte espaço"
-            id="validateWord"
-            ></input>
+        <input class="form-control mb-4" rows="3" placeholder="Digite a palavra para validação e aperte espaço"
+            id="validateWord"></input>
 
         <div class="container mt-4">
             <table class="table table-bordered">
@@ -61,6 +63,11 @@
                     <tr id="target-row">
                 </tbody>
             </table>
+        </div>
+
+        <div class="container mt-4">
+            <h4>Palavras Testadas</h4>
+            <div class="mb-4" id="ValidatedWords"></div>
         </div>
     </div>
 

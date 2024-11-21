@@ -2,10 +2,15 @@ const wordInput = document.getElementById('wordInput');
 const wordList = document.getElementById('wordList');
 const randomWordBtn = document.getElementById('randomWordBtn');
 const validateInput = document.getElementById('validateWord');
+const validatedWords = document.getElementById('ValidatedWords');
 
 // Lista de palavras
 const words = [];
 let mappedWords;
+
+let currentState = "q0";
+
+let invalidCharCount = 0;
 
 // Adicionar palavra ao pressionar espaço
 wordInput.addEventListener('keypress', (e) => {
@@ -162,57 +167,77 @@ function resizeTable(words) {
   });
 }
 
-function checkWordInAlphabet(word) {
-  const slicedWord = word.split(""); // Divide a palavra em letras
-  let currentState = "q0"; // Começa no estado inicial
-
-  console.log(mappedWords, "\nPalavras mapeadas"); // Debug do mapeamento
-
-  for (let key of slicedWord) {
-    key = key.toUpperCase();
-
-    // Obter o estado atual no mapeamento
-    const stateMapping = mappedWords[currentState];
-    if (!stateMapping) {
-      console.log(`Estado inválido: ${currentState}`);
-      return;
-    }
-
-    // Procurar se a chave está mapeada no estado atual
-    const nextState = Object.keys(stateMapping).find(
-      state => stateMapping[state] === key
-    );
-
-    console.log(`Key: ${key}`);
-    console.log(`Current State: ${currentState}`);
-    console.log(`State Mapping:`, stateMapping);
-    console.log(`Next State: ${nextState}`);
-
-    if (nextState) {
-      currentState = nextState; // Atualiza para o próximo estado
-    } else {
-      console.log(`A palavra '${key}' Não pertence ao alfabeto! :(`);
-      return;
-    }
-  }
-
-  console.log(`A palavra '${word}' pertence ao alfabeto! :D`);
+function isValid(char) {
+  const regex = /^[A-Za-z ]$/;
+  return regex.test(char);
 }
 
+function validateChar(char) {
 
+  const stateMapping = mappedWords[currentState];
+
+  if (!stateMapping) {
+    console.log(`Estado inválido: ${currentState}`);
+    return false;
+  }
+
+  const nextState = Object.keys(stateMapping).find(
+    state => stateMapping[state] === char.toUpperCase()
+  );
+
+  if (nextState && invalidCharCount === 0) {
+    currentState = nextState;
+    console.log(`Estado atual: ${currentState}`);
+    console.log('char ' + char + ' é valido')
+    return true;
+  } else {
+    console.log(`Caractere inválido para o estado ${currentState} ` + char.toUpperCase());
+    invalidChar = true;
+    invalidCharCount ++;
+    console.log(invalidChar)
+    return false;
+  }
+}
+
+function printWord(word, color) {
+  const span = document.createElement('span');
+  span.textContent = word;
+  span.style.fontWeight = 'bold';
+  span.style.color = color;
+  validatedWords.appendChild(span);
+}
+
+function checkWordInAlphabet() {
+  console.log(mappedWords[currentState])
+
+  if (Object.keys(mappedWords[currentState]).length === 0) {
+    printWord(validateInput.value, 'green');
+    return true
+  }
+  printWord(validateInput.value, 'red');
+  return false
+}
 
 // Palavras digitadas para validação
-validateInput.addEventListener('keypress', (e) => {
+validateInput.addEventListener('keydown', (e) => {
   if (e.key === ' ') {
     e.preventDefault();
+    resizeTable(words);
     const word = validateInput.value.trim();
     if (word) {
-      checkWordInAlphabet(word);
+      checkWordInAlphabet() == true ? alert(`A palavra ${validateInput.value} está presente no alfabeto :D`) : alert(`A palavra ${validateInput.value} não está presente no alfabeto ;(`);
       validateInput.value = '';
+      currentState = 'q0';
+      invalidCharCount = 0;
     }
-  } else if (e.key === "QUALQUER CARACTERRE QUE A PESSOA DIGITAR") {
-    // pinta o indice digitado na tabela de verde
-  } else if (e.key === 'backspace') {
-    // pinta da cor default o tr e volta para a iteração anterior
+  } else if (e.key === 'Backspace') {
+    console.log('backspace')
+    invalidCharCount--;
+    console.log(invalidCharCount)
+  } else {
+    if (isValid(e.key) && validateChar(e.key)) {
+      console.log(currentState)
+    }
   }
+
 });
