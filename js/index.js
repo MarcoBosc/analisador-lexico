@@ -210,7 +210,7 @@ function printWord(word, color) {
 function checkWordInAlphabet() {
   console.log(mappedWords[currentState])
 
-  if (Object.keys(mappedWords[currentState]).length === 0) {
+  if (Object.keys(mappedWords[currentState]).length === 0 && invalidCharCount === 0 ) {
     printWord(validateInput.value, 'green');
     return true
   }
