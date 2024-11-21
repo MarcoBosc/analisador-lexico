@@ -12,6 +12,8 @@ let currentState = "q0";
 
 let invalidCharCount = 0;
 
+let coloredStates = {}
+
 // Adicionar palavra ao pressionar espaço
 wordInput.addEventListener('keypress', (e) => {
   if (e.key === ' ' || e.key === 'Enter') {
@@ -167,9 +169,34 @@ function resizeTable(words) {
   });
 }
 
+function paintAutomaton() {
+  // pintar o automato quando atualizar o coloredStates
+}
+
+function updateColoredStates(currentState, char, color) {
+  if (!coloredStates[currentState]) {
+    coloredStates[currentState] = [];
+  }
+
+  if (invalidCharCount === 0) {
+    coloredStates[currentState].push({
+      character: char,
+      isValid: color
+    });
+  }
+  console.log(coloredStates);
+}
+
 function isValid(char) {
   const regex = /^[A-Za-z ]$/;
-  return regex.test(char);
+  const hasNumbers = /\d/;
+  return regex.test(char) && !hasNumbers.test(char);
+}
+
+function isValidWord(char) {
+  const regex = /^[A-Za-z]+$/;
+  const hasNumbers = /\d/;
+  return regex.test(char) && !hasNumbers.test(char);
 }
 
 function validateChar(char) {
@@ -186,11 +213,14 @@ function validateChar(char) {
   );
 
   if (nextState && invalidCharCount === 0) {
+    updateColoredStates(currentState, char, "green");
     currentState = nextState;
     console.log(`Estado atual: ${currentState}`);
     console.log('char ' + char + ' é valido')
     return true;
   } else {
+    updateColoredStates(currentState, char, "red");
+    console.log(coloredStates);
     console.log(`Caractere inválido para o estado ${currentState} ` + char.toUpperCase());
     invalidChar = true;
     invalidCharCount ++;
@@ -218,22 +248,46 @@ function checkWordInAlphabet() {
   return false
 }
 
+function getPreviousState() {
+  for (let prevState in mappedWords) {
+      // Verifica se algum dos valores de 'prevState' é igual ao currentState
+      if (mappedWords[prevState][currentState]) {
+         console.log('Estado atual: ' + currentState + "estado anterior: "+ prevState)
+          return prevState; // Retorna o último estado antes de 'currentState'
+      }
+  }
+  return null; // Retorna null se não encontrar o estado anterior
+}
+
 // Palavras digitadas para validação
 validateInput.addEventListener('keydown', (e) => {
   if (e.key === ' ') {
     e.preventDefault();
+    coloredStates = {};
     resizeTable(words);
     const word = validateInput.value.trim();
-    if (word) {
+    if (isValidWord(word)) {
       checkWordInAlphabet() == true ? alert(`A palavra ${validateInput.value} está presente no alfabeto :D`) : alert(`A palavra ${validateInput.value} não está presente no alfabeto ;(`);
-      validateInput.value = '';
-      currentState = 'q0';
-      invalidCharCount = 0;
+    } else {
+      alert("Essa palavra contém caracteres inválidos.");
     }
+    validateInput.value = '';
+    currentState = 'q0';
+    invalidCharCount = 0;
   } else if (e.key === 'Backspace') {
     console.log('backspace')
-    invalidCharCount--;
-    console.log(invalidCharCount)
+    invalidCharCount <= 0 ? invalidCharCount = 0 : invalidCharCount--;
+    console.log(coloredStates);
+    console.log(currentState + "Estado atual apagado");
+    if (invalidCharCount === 0 && Array.isArray(coloredStates[currentState]) && coloredStates[currentState].length > 0) {
+      coloredStates[currentState].pop();
+    } else {
+      coloredStates[getPreviousState()].pop();
+      if (invalidCharCount === 0) currentState = getPreviousState(); // volta o estado anterior
+    }
+    console.log(invalidCharCount);
+    console.log(coloredStates);
+    console.log(currentState)
   } else {
     if (isValid(e.key) && validateChar(e.key)) {
       console.log(currentState)
