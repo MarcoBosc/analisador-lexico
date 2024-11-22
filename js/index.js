@@ -224,12 +224,6 @@ function updateColoredStates(currentState, char, color) {
   console.log(coloredStates);
 }
 
-function isValid(char) {
-  const regex = /^[A-Za-z ]$/;
-  const hasNumbers = /\d/;
-  return regex.test(char) && !hasNumbers.test(char);
-}
-
 function isValidWord(char) {
   const regex = /^[A-Za-z]+$/;
   const hasNumbers = /\d/;
@@ -285,6 +279,17 @@ function checkWordInAlphabet() {
   return false
 }
 
+function getNextState() {
+  for (let nextState in mappedWords) {
+      // Verifica se o valor de 'currentState' é um índice válido para o próximo estado
+      if (mappedWords[nextState][currentState]) {
+          console.log('Estado atual: ' + currentState + " estado seguinte: " + nextState);
+          return nextState; // Retorna o próximo estado após 'currentState'
+      }
+  }
+  return null; // Retorna null se não encontrar o próximo estado
+}
+
 function getPreviousState() {
   for (let prevState in mappedWords) {
       // Verifica se algum dos valores de 'prevState' é igual ao currentState
@@ -306,6 +311,9 @@ validateInput.addEventListener('keydown', (e) => {
     if (isValidWord(word)) {
       checkWordInAlphabet() == true ? alert(`A palavra ${validateInput.value} está presente no alfabeto :D`) : alert(`A palavra ${validateInput.value} não está presente no alfabeto ;(`);
     } else {
+      validateInput.value = '';
+      currentState = 'q0';
+      invalidCharCount = 0;
       alert("Essa palavra contém caracteres inválidos.");
     }
     validateInput.value = '';
@@ -327,9 +335,7 @@ validateInput.addEventListener('keydown', (e) => {
     console.log(coloredStates);
     console.log(currentState)
   } else {
-    if (isValid(e.key) && validateChar(e.key)) {
-      console.log(currentState)
-    }
+    validateChar(e.key)
   }
 
 });
