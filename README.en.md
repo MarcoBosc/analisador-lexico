@@ -27,6 +27,110 @@ The **Lexical Analyzer** allows the validation of words in a defined alphabet by
 - **Word Validation**: The system allows you to validate if a word belongs to the current alphabet. To do this, simply type the word in the analysis field and press **space**. The analyzer will traverse the automaton, analyzing each letter.
 - After pressing space, the system will inform you if the word **belongs** or **does not belong** to the alphabet.
 
+---
+
+- **Operation**: To validate whether a word exists, the system traverses the automaton mapped in the JSON called **mappedWords** and stores the current state of the automaton in the **currentState** variable. This way, with each typed character, the automaton moves one position forward in the mapping. When the word being typed leads the **currentState** to a position where no mapping exists, it means that the end of the word has been reached and the typed word belongs to the alphabet.
+
+- The **mappedWords** is mapped as follows:
+
+```
+Note that states q4, q7, q10, and q19 are final states.
+{
+    "q0": {
+        "q1": "A",
+        "q11": "B"
+    },
+    "q1": {
+        "q2": "G"
+    },
+    "q2": {
+        "q3": "U",
+        "q8": "O"
+    },
+    "q3": {
+        "q4": "A",
+        "q5": "L"
+    },
+    "q4": {},
+    "q5": {
+        "q6": "H"
+    },
+    "q6": {
+        "q7": "A"
+    },
+    "q7": {},
+    "q8": {
+        "q9": "R"
+    },
+    "q9": {
+        "q10": "A"
+    },
+    "q10": {},
+    "q11": {
+        "q12": "O"
+    },
+    "q12": {
+        "q13": "R"
+    },
+    "q13": {
+        "q14": "B"
+    },
+    "q14": {
+        "q15": "O"
+    },
+    "q15": {
+        "q16": "L"
+    },
+    "q16": {
+        "q17": "E"
+    },
+    "q17": {
+        "q18": "T"
+    },
+    "q18": {
+        "q19": "A"
+    },
+    "q19": {}
+}
+```
+
+- To paint the automaton, the logic is similar to the mapping. Basically, the automaton maps the typed characters and validates whether they are valid or invalid, assigns a color to these states, and stores them in the **coloredStates** variable. Then, it calls **paintCells**, which is responsible for locating each of these states and painting them with the mapped color. If the state doesn't have a specified color, it is painted with the default table color (this happens when backspace is activated).
+
+- The **coloredStates** is mapped as follows:
+
+```
+{
+    "q0": [
+        {
+            "character": "a",
+            "color": "green"
+        }
+    ],
+    "q1": [
+        {
+            "character": "g",
+            "color": "green"
+        }
+    ],
+    "q2": [
+        {
+            "character": "u",
+            "color": "green"
+        }
+    ],
+    "q3": [
+        {
+            "character": "h",
+            "color": "red"
+        }
+    ]
+}
+```
+
+- **Invalid characters**: Whenever an invalid character is typed, it adds 1 value to the **invalidCharCount** variable, and the automaton only starts traversing again when this variable equals zero.
+
+---
+
 ## How to Use
 
 1. Type or generate words and add them to the list.
