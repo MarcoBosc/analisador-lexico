@@ -169,9 +169,45 @@ function resizeTable(words) {
   });
 }
 
-function paintAutomaton() {
-  // pintar o automato quando atualizar o coloredStates
+function paintCells() {
+  if (!coloredStates || typeof coloredStates !== 'object') {
+    console.error('coloredStates não é válido:', coloredStates);
+    return;
+  }
+
+  const rows = document.querySelectorAll('tbody tr'); // Seleciona todas as linhas da tabela
+
+  // Itera sobre cada estado em coloredStates
+  for (const [state, transitions] of Object.entries(coloredStates)) {
+    const currentRow = Array.from(rows).find(row => row.firstChild.textContent === state);
+
+    if (currentRow) {
+      const cells = currentRow.querySelectorAll('td');
+
+      // Se há transições, pinta as células correspondentes
+      if (transitions.length > 0) {
+        transitions.forEach(transition => {
+          const index = parseInt(transition.character, 36) - 9; // Mapeia 'a', 'b'... para índices numéricos
+          if (index >= 0 && index < cells.length) {
+            const validCell = cells[index];
+            validCell.style.backgroundColor = transition.color === 'green' ? 'green' : 'red'; // Verde ou vermelho
+            validCell.style.color = '#FFF'; // Texto branco
+          }
+        });
+      } else {
+        // Se não há transições, restaura a cor padrão da linha
+        cells.forEach(cell => {
+          cell.style.backgroundColor = ''; // Fundo padrão
+          cell.style.color = ''; // Texto padrão
+        });
+      }
+    }
+  }
 }
+
+
+
+
 
 function updateColoredStates(currentState, char, color) {
   if (!coloredStates[currentState]) {
@@ -181,8 +217,9 @@ function updateColoredStates(currentState, char, color) {
   if (invalidCharCount === 0) {
     coloredStates[currentState].push({
       character: char,
-      isValid: color
+      color: color
     });
+    paintCells();
   }
   console.log(coloredStates);
 }
@@ -285,6 +322,7 @@ validateInput.addEventListener('keydown', (e) => {
       coloredStates[getPreviousState()].pop();
       if (invalidCharCount === 0) currentState = getPreviousState(); // volta o estado anterior
     }
+    paintCells();
     console.log(invalidCharCount);
     console.log(coloredStates);
     console.log(currentState)
