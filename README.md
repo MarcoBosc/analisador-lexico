@@ -13,6 +13,8 @@ Este projeto foi desenvolvido como parte do trabalho final da matéria de Lingua
 
 O **Analisador Léxico** permite a validação de palavras em um alfabeto definido, criando e gerando um autômato com base nas palavras fornecidas. As palavras podem ser adicionadas manualmente ou geradas aleatoriamente.
 
+![Screenshot](https://github.com/MarcoBosc/analisador-lexico/blob/main/screenshot.png)
+
 ### Adicionar Palavras
 
 - **Campo de Adicionar Palavra**: Você pode digitar uma palavra no campo de adicionar palavra e apertar a tecla **espaço** para adicioná-la à lista de palavras. 

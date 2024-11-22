@@ -12,6 +12,8 @@ This project was developed as part of the final assignment for the Formal Langua
 
 The **Lexical Analyzer** allows the validation of words in a defined alphabet by creating and generating an automaton based on the given words. Words can be added manually or generated randomly.
 
+![Screenshot](https://github.com/MarcoBosc/analisador-lexico/blob/main/screenshot.png)
+
 ### Add Words
 
 - **Add Word Field**: You can type a word in the "Add Word" field and press the **space** key to add it to the list of words.
