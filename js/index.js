@@ -174,8 +174,6 @@ function getFinalStates(automaton) {
 
 function resizeTable(words) {
   mappedWords = adjustFinalStates(mapWords(words));
-  console.log("Com finais", JSON.stringify(mappedWords));
-
   // Identificando todos os índices qN usados, incluindo vazios
   let allIndexes = new Set();
   let finalStates = new Set(); // Para rastrear estados finais (com *)
@@ -285,11 +283,8 @@ function updateColoredStates(currentState, char, color) {
 
   if (invalidCharCount === 0) {
     let state;
-    console.log("ESTADO ATUAL PARA PINTAR" + currentState)
     getFinalStates(mappedWords);
-    console.log("ESTADOS FINAIS AQUI" + finalStates)
     state = finalStates.indexOf(currentState + '*') !== -1 ? currentState + '*' : currentState;
-    console.log("ESTADO ATUAL QUE SERA PINTADO" + state)
 
     coloredStates[state].push({
       character: char,
@@ -297,7 +292,6 @@ function updateColoredStates(currentState, char, color) {
     });
     paintCells();
   }
-  console.log(coloredStates);
 }
 
 function isValidWord(char) {
@@ -314,7 +308,6 @@ function validateChar(char) {
   const stateMapping = mappedWords[state];
 
   if (!stateMapping) {
-    console.log(`Estado inválido: ${state}`);
     return false;
   }
 
@@ -328,18 +321,13 @@ function validateChar(char) {
     state = finalStates.indexOf(currentState + '*') !== -1 ? currentState + '*' : currentState;
     updateColoredStates(state, char, "green");
     currentState = nextState;
-    console.log(`Estado atual: ${currentState}`);
-    console.log('char ' + char + ' é valido')
     return true;
   } else {
     invalidChar = true;
     getFinalStates(mappedWords);
     state = finalStates.indexOf(state + '*') !== -1 ? currentState + '*' : currentState;
     updateColoredStates(currentState, char, "red");
-    console.log(coloredStates);
-    console.log(`Caractere inválido para o estado ${currentState} ` + char.toUpperCase());
     invalidCharCount++;
-    console.log(invalidChar)
     return false;
   }
 }
@@ -353,7 +341,6 @@ function printWord(word, color) {
 }
 
 function checkWordInAlphabet() {
-  console.log("Aqui na finaleira" + invalidChar)
   if (Object.keys(finalStates.indexOf(mappedWords[currentState+'*'])) && invalidCharCount === 0 && !invalidChar) {
     printWord(validateInput.value, 'green');
     return true
@@ -366,7 +353,6 @@ function getNextState() {
   for (let nextState in mappedWords) {
     // Verifica se o valor de 'currentState' é um índice válido para o próximo estado
     if (mappedWords[nextState][currentState]) {
-      console.log('Estado atual: ' + currentState + " estado seguinte: " + nextState);
       return nextState; // Retorna o próximo estado após 'currentState'
     }
   }
@@ -377,7 +363,6 @@ function getPreviousState() {
   for (let prevState in mappedWords) {
     // Verifica se algum dos valores de 'prevState' é igual ao currentState
     if (mappedWords[prevState][currentState]) {
-      console.log('Estado atual: ' + currentState + "estado anterior: " + prevState)
       return prevState; // Retorna o último estado antes de 'currentState'
     }
   }
@@ -404,10 +389,7 @@ validateInput.addEventListener('keydown', (e) => {
     currentState = 'q0';
     invalidCharCount = 0;
   } else if (e.key === 'Backspace') {
-    console.log('backspace')
     invalidCharCount <= 0 ? invalidCharCount = 0 : invalidCharCount--;
-    console.log(coloredStates);
-    console.log(currentState + "Estado atual apagado");
     if (invalidCharCount === 0 && Array.isArray(coloredStates[currentState]) && coloredStates[currentState].length > 0) {
       coloredStates[currentState].pop();
     } else {
@@ -415,9 +397,7 @@ validateInput.addEventListener('keydown', (e) => {
       if (invalidCharCount === 0) currentState = getPreviousState(); // volta o estado anterior
     }
     paintCells();
-    console.log(invalidCharCount);
-    console.log(coloredStates);
-    console.log(currentState)
+  } else if (e.key === "Shift" || e.key === "Alt" || e.key === "Control" || e.key === "CapsLock" || e.key === "ALTGRAPH"){
   } else {
     validateChar(e.key)
   }
