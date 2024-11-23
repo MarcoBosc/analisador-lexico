@@ -38,16 +38,23 @@
     <div class="container mt-4">
         <h1>Analisador Léxico</h1>
 
+        <!-- Input de Palavra -->
         <input type="text" id="wordInput" class="form-control mb-3" placeholder="Digite uma palavra e aperte espaço">
 
-        <button id="randomWordBtn" class="btn btn-primary mb-3">Gerar Palavra Aleatória</button>
+        <!-- Botões -->
+        <div class="d-flex justify-content-between flex-wrap mb-3">
+            <button id="randomWordBtn" class="btn btn-primary">Gerar Palavra Aleatória</button>
+            <button class="btn btn-danger" onclick="location.reload()">Limpar</button>
+        </div>
+
         <h4>Palavras Adicionadas</h4>
         <div id="wordList" class="mb-4"></div>
 
-        <input class="form-control mb-4" rows="3" placeholder="Digite a palavra para validação e aperte espaço"
-            id="validateWord"></input>
+        <!-- Validação de Palavra -->
+        <input class="form-control mb-4" placeholder="Digite a palavra para validação e aperte espaço" id="validateWord">
 
-        <div class="container mt-4">
+        <!-- Tabela de Letras -->
+        <div class="table-responsive">
             <table class="table table-bordered">
                 <thead>
                     <tr class="bg-primary text-white">
@@ -61,11 +68,13 @@
                 </thead>
                 <tbody>
                     <tr id="target-row">
+                    </tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="container mt-4 " style="word-wrap: break-word;">
+        <!-- Palavras Testadas -->
+        <div class="container mt-4" style="word-wrap: break-word;">
             <h4>Palavras Testadas</h4>
             <div class="mb-4" id="ValidatedWords"></div>
         </div>

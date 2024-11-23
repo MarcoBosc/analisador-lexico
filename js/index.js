@@ -278,10 +278,6 @@ function paintCells() {
   }
 }
 
-
-
-
-
 function updateColoredStates(currentState, char, color) {
   if (!coloredStates[currentState]) {
     coloredStates[currentState] = [];
