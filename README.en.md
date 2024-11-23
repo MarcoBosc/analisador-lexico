@@ -8,6 +8,8 @@ Marco Boschetti and Ricardo Dequi
 
 This project was developed as part of the final assignment for the Formal Languages course, using the technologies: **JavaScript**, **HTML**, **CSS**, and **Bootstrap**.
 
+To run the project, simply open the index.html file in the root folder of the project with Google Chrome or any other preferred browser, or use the Visual Studio Code extension called Live Server.
+
 ## Functionality
 
 The **Lexical Analyzer** allows the validation of words in a defined alphabet by creating and generating an automaton based on the given words. Words can be added manually or generated randomly.

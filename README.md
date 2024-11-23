@@ -9,6 +9,8 @@ Marco Boschetti e Ricardo Dequi
 
 Este projeto foi desenvolvido como parte do trabalho final da matéria de Linguagens Formais, utilizando as tecnologias: **JavaScript**, **HTML**, **CSS** e **Bootstrap**.
 
+Para executar o projeto, basta abrir o `index.html` na pasta raiz do projeto com o Google Chrome ou outro navegador de preferência, ou utilizar a extensão do Visual Studio Code chamada Live Server..
+
 ## Funcionalidade
 
 O **Analisador Léxico** permite a validação de palavras em um alfabeto definido, criando e gerando um autômato com base nas palavras fornecidas. As palavras podem ser adicionadas manualmente ou geradas aleatoriamente.
