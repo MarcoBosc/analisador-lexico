@@ -12,7 +12,11 @@ let currentState = "q0";
 
 let invalidCharCount = 0;
 
+let invalidChar = false;
+
 let coloredStates = {}
+
+let finalStates = []
 
 // Adicionar palavra ao pressionar espaço
 wordInput.addEventListener('keypress', (e) => {
@@ -75,31 +79,36 @@ function addWord(word) {
 function mapWords(words) {
   let stateMapping = {};
   let currentState = 1;
-
   // Inicializa o estado q0
   stateMapping["q0"] = {};
 
   function addWordToMap(word) {
     let prevState = "q0";
-
+  
     // Para cada letra da palavra
     for (let i = 0; i < word.length; i++) {
       let currentLetter = word[i].toUpperCase();
-
+  
       // Verifica se já existe uma transição para a letra atual no estado anterior
       let nextState = Object.keys(stateMapping[prevState]).find(state => stateMapping[prevState][state] === currentLetter);
-
+  
       // Se não existir, cria um novo estado
       if (!nextState) {
         nextState = `q${currentState}`;
         stateMapping[prevState][nextState] = currentLetter;
-        stateMapping[nextState] = {};
+        stateMapping[nextState] = {}; // Inicializa o novo estado
         currentState++;
       }
-
-      prevState = nextState;
+  
+      prevState = nextState; // Atualiza o estado anterior para o atual
+    }
+  
+    // Marca o estado final com "*"
+    if (!stateMapping[prevState].final) {
+      stateMapping[prevState].final = "*";
     }
   }
+  
 
   // Mapeando todas as palavras da lista words
   words.forEach(word => addWordToMap(word));
@@ -107,22 +116,85 @@ function mapWords(words) {
   return stateMapping;
 }
 
+function adjustFinalStates(mappedWords) {
+  let adjustedMap = {};
+  let finalStateNames = new Set(); // Para rastrear os estados finais
+
+  // Primeira passagem: identifica estados finais e cria o novo mapa
+  Object.keys(mappedWords).forEach(key => {
+    let isFinal = mappedWords[key].hasOwnProperty('final'); // Verifica se o estado é final
+    let newKey = isFinal ? `${key}*` : key; // Adiciona o '*' ao nome do estado final
+
+    if (isFinal) {
+      finalStateNames.add(key); // Armazena o nome original do estado final
+    }
+
+    // Cria o novo estado sem o atributo 'final'
+    adjustedMap[newKey] = { ...mappedWords[key] };
+    if (isFinal) {
+      delete adjustedMap[newKey].final; // Remove o atributo 'final'
+    }
+  });
+
+  // Segunda passagem: ajusta as transições
+  Object.keys(adjustedMap).forEach(key => {
+    let updatedTransitions = {};
+
+    Object.entries(adjustedMap[key]).forEach(([nextState, letter]) => {
+      // Se o estado de destino for final, ajusta seu nome com '*'
+      let updatedNextState = finalStateNames.has(nextState) ? `${nextState}*` : nextState;
+
+      // Evita a transição para estados finais com o '*'
+      if (finalStateNames.has(nextState)) {
+        updatedNextState = nextState; // Remove o asterisco da transição
+      }
+      updatedTransitions[updatedNextState] = letter;
+    });
+
+    adjustedMap[key] = updatedTransitions;
+  });
+
+  return adjustedMap;
+}
+
+function getFinalStates(automaton) {
+  automaton = adjustFinalStates(mappedWords);
+
+  // Percorre todos os estados em mappedWords
+  Object.keys(automaton).forEach(state => {
+    // Se o estado contém um '*', significa que é um estado final
+    if (state.includes('*') && !finalStates.includes(state)) {
+      finalStates.push(state); // Adiciona à lista de estados finais se não for repetido
+    }
+  });
+
+  return finalStates;
+}
+
 
 function resizeTable(words) {
-  mappedWords = mapWords(words);
+  mappedWords = adjustFinalStates(mapWords(words));
+  console.log("Com finais", JSON.stringify(mappedWords));
 
   // Identificando todos os índices qN usados, incluindo vazios
   let allIndexes = new Set();
+  let finalStates = new Set(); // Para rastrear estados finais (com *)
+
   Object.keys(mappedWords).forEach(key => {
-    allIndexes.add(key);  // Adiciona o índice atual
+    if (key.includes('*')) {
+      finalStates.add(key); // Adiciona os estados finais
+    }
+    let normalizedKey = key.replace('*', ''); // Normaliza removendo o '*'
+    allIndexes.add(normalizedKey); // Adiciona sem duplicar
     Object.keys(mappedWords[key]).forEach(nextIndex => {
-      allIndexes.add(nextIndex);  // Adiciona o próximo índice mapeado
+      let normalizedNextIndex = nextIndex.replace('*', '');
+      allIndexes.add(normalizedNextIndex);
     });
   });
 
   // Ordenar os índices de forma crescente
   allIndexes = Array.from(allIndexes).sort((a, b) => {
-    let numA = parseInt(a.slice(1));  // Extrai o número do índice qN
+    let numA = parseInt(a.slice(1)); // Extrai o número do índice qN
     let numB = parseInt(b.slice(1));
     return numA - numB;
   });
@@ -135,29 +207,29 @@ function resizeTable(words) {
     tbody.removeChild(tbody.lastChild);
   }
 
-  // Para cada "q0", "q1", "q2" ... até o maior índice necessário
+  // Para cada índice (q0, q1, q2, ...)
   allIndexes.forEach(index => {
+    let isFinal = finalStates.has(`${index}*`); // Verifica se o estado é final
     let tr = document.createElement('tr');
 
     // Cria a célula de label (q0, q1, q2...)
     let tdLabel = document.createElement('td');
-    tdLabel.textContent = index;
+    tdLabel.textContent = isFinal ? `${index}*` : index; // Adiciona o '*' se for final
     tr.appendChild(tdLabel);
 
-    // Agora, para cada letra de A até Z, vamos criar a lógica de mapeamento
-    let seenLetters = new Set(); // Usado para garantir que não mapeemos a mesma letra várias vezes
+    // Para cada letra de A até Z, cria as células
+    let seenLetters = new Set(); // Usado para evitar mapeamentos duplicados
 
     for (let j = 0; j < 26; j++) {
       let td = document.createElement('td');
-      let letter = String.fromCharCode(65 + j);  // Letras A até Z (ASCII 65 é 'A')
+      let letter = String.fromCharCode(65 + j); // Letras A até Z
 
       // Verifica se a letra está presente no mapeamento
-      if (mappedWords[index]) {
-        Object.entries(mappedWords[index]).forEach(([nextIndex, letterValue]) => {
+      if (mappedWords[`${index}${isFinal ? '*' : ''}`]) {
+        Object.entries(mappedWords[`${index}${isFinal ? '*' : ''}`]).forEach(([nextIndex, letterValue]) => {
           if (letterValue === letter && !seenLetters.has(letter)) {
-            // Adiciona a letra à lista de letras vistas
             seenLetters.add(letter);
-            td.textContent = nextIndex;  // Mapeia para o próximo índice disponível
+            td.textContent = nextIndex; // Mapeia para o próximo índice
           }
         });
       }
@@ -168,6 +240,7 @@ function resizeTable(words) {
     tbody.appendChild(tr);
   });
 }
+
 
 function paintCells() {
   if (!coloredStates || typeof coloredStates !== 'object') {
@@ -215,7 +288,14 @@ function updateColoredStates(currentState, char, color) {
   }
 
   if (invalidCharCount === 0) {
-    coloredStates[currentState].push({
+    let state;
+    console.log("ESTADO ATUAL PARA PINTAR" + currentState)
+    getFinalStates(mappedWords);
+    console.log("ESTADOS FINAIS AQUI" + finalStates)
+    state = finalStates.indexOf(currentState + '*') !== -1 ? currentState + '*' : currentState;
+    console.log("ESTADO ATUAL QUE SERA PINTADO" + state)
+
+    coloredStates[state].push({
       character: char,
       color: color
     });
@@ -232,10 +312,13 @@ function isValidWord(char) {
 
 function validateChar(char) {
 
-  const stateMapping = mappedWords[currentState];
+  getFinalStates(mappedWords);
+  state = finalStates.indexOf(currentState + '*') !== -1 ? currentState + '*' : currentState;
+
+  const stateMapping = mappedWords[state];
 
   if (!stateMapping) {
-    console.log(`Estado inválido: ${currentState}`);
+    console.log(`Estado inválido: ${state}`);
     return false;
   }
 
@@ -244,17 +327,22 @@ function validateChar(char) {
   );
 
   if (nextState && invalidCharCount === 0) {
-    updateColoredStates(currentState, char, "green");
+    invalidChar = false;
+    getFinalStates(mappedWords);
+    state = finalStates.indexOf(currentState + '*') !== -1 ? currentState + '*' : currentState;
+    updateColoredStates(state, char, "green");
     currentState = nextState;
     console.log(`Estado atual: ${currentState}`);
     console.log('char ' + char + ' é valido')
     return true;
   } else {
+    invalidChar = true;
+    getFinalStates(mappedWords);
+    state = finalStates.indexOf(state + '*') !== -1 ? currentState + '*' : currentState;
     updateColoredStates(currentState, char, "red");
     console.log(coloredStates);
     console.log(`Caractere inválido para o estado ${currentState} ` + char.toUpperCase());
-    invalidChar = true;
-    invalidCharCount ++;
+    invalidCharCount++;
     console.log(invalidChar)
     return false;
   }
@@ -269,9 +357,8 @@ function printWord(word, color) {
 }
 
 function checkWordInAlphabet() {
-  console.log(mappedWords[currentState])
-
-  if (Object.keys(mappedWords[currentState]).length === 0 && invalidCharCount === 0 ) {
+  console.log("Aqui na finaleira" + invalidChar)
+  if (Object.keys(finalStates.indexOf(mappedWords[currentState+'*'])) && invalidCharCount === 0 && !invalidChar) {
     printWord(validateInput.value, 'green');
     return true
   }
@@ -281,32 +368,33 @@ function checkWordInAlphabet() {
 
 function getNextState() {
   for (let nextState in mappedWords) {
-      // Verifica se o valor de 'currentState' é um índice válido para o próximo estado
-      if (mappedWords[nextState][currentState]) {
-          console.log('Estado atual: ' + currentState + " estado seguinte: " + nextState);
-          return nextState; // Retorna o próximo estado após 'currentState'
-      }
+    // Verifica se o valor de 'currentState' é um índice válido para o próximo estado
+    if (mappedWords[nextState][currentState]) {
+      console.log('Estado atual: ' + currentState + " estado seguinte: " + nextState);
+      return nextState; // Retorna o próximo estado após 'currentState'
+    }
   }
   return null; // Retorna null se não encontrar o próximo estado
 }
 
 function getPreviousState() {
   for (let prevState in mappedWords) {
-      // Verifica se algum dos valores de 'prevState' é igual ao currentState
-      if (mappedWords[prevState][currentState]) {
-         console.log('Estado atual: ' + currentState + "estado anterior: "+ prevState)
-          return prevState; // Retorna o último estado antes de 'currentState'
-      }
+    // Verifica se algum dos valores de 'prevState' é igual ao currentState
+    if (mappedWords[prevState][currentState]) {
+      console.log('Estado atual: ' + currentState + "estado anterior: " + prevState)
+      return prevState; // Retorna o último estado antes de 'currentState'
+    }
   }
   return null; // Retorna null se não encontrar o estado anterior
 }
 
 // Palavras digitadas para validação
 validateInput.addEventListener('keydown', (e) => {
-  if (e.key === ' ') {
+  if (e.key === ' ' || e.key === 'Enter') {
     e.preventDefault();
     coloredStates = {};
     resizeTable(words);
+    getFinalStates(mappedWords);
     const word = validateInput.value.trim();
     if (isValidWord(word)) {
       checkWordInAlphabet() == true ? alert(`A palavra ${validateInput.value} está presente no alfabeto :D`) : alert(`A palavra ${validateInput.value} não está presente no alfabeto ;(`);
